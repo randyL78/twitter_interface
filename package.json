@@ -1,0 +1,25 @@
+{
+  "name": "twitter_interface",
+  "version": "1.0.0",
+  "description": "Build an interface to pull profile and tweets from Twitter's API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/randyL78/twitter_interface.git"
+  },
+  "author": "Randy Layne <randydavidl78@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/randyL78/twitter_interface/issues"
+  },
+  "homepage": "https://github.com/randyL78/twitter_interface#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "nodemon": "^1.14.8",
+    "pug": "^2.0.0-rc.4"
+  }
+}
