@@ -3,9 +3,8 @@ include header
 include footer
 .bounds.app--body
   .app--section--header
-    include section-headings  
-    include section-headings  
-    include section-headings
+    each val in ["Timeline", "Following", "Direct Messages"]
+      include section-headings
   .grid-33
     .app--section
       ul.app--tweet--list

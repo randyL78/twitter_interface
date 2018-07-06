@@ -6,7 +6,9 @@ const router = express.Router();
 
 // GET home route
 router.get('/', (req, res, next)  => {
-  res.render('index');
+  const data = {name: "Randy Layne"}
+
+  res.render('index', {data});
 })
 
 module.exports = router;
