@@ -8,7 +8,8 @@ include footer
   .grid-33
     .app--section
       ul.app--tweet--list
-        include cards/timeline
+        each timePost in data.timeline
+          include cards/timeline
   .grid-33
     .app--section
       ul.app--user--list
