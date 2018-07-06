@@ -1,3 +1,33 @@
 include layout
 include header
 include footer
+.bounds.app--body
+  .app--section--header
+    include section-headings  
+    include section-headings  
+    include section-headings
+  .grid-33
+    .app--section
+      ul.app--tweet--list
+        include cards/timeline
+  .grid-33
+    .app--section
+      ul.app--user--list
+        include cards/following
+        include cards/following
+        include cards/following
+        include cards/following
+        include cards/following
+  .grid-33
+    .app--section
+      ul.app--message--list
+        li
+          h3 Conversation with 
+            a Jill Spore
+          ul.app--message--conversation
+            include cards/message-from
+            include cards/message-to
+            include cards/message-from
+            include cards/message-from
+            include cards/message-to
+
