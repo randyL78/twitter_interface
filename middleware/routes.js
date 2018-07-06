@@ -6,7 +6,7 @@ const router = express.Router();
 
 // GET home route
 router.get('/', (req, res, next)  => {
-  const data = {name: "Randy Layne"}
+  const data =  req.data ||  {name: "User"};
 
   res.render('index', {data});
 })

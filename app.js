@@ -3,7 +3,8 @@ const express = require('express');
 const path = require('path');
 
 // Custom middleware imports 
-const routes = require("./middleware/routes.js")
+const routes = require("./middleware/routes");
+const createData = require("./middleware/createData");
 
 
 // Global variables
@@ -16,6 +17,9 @@ app.set('view engine', 'pug');
 
 /* Set location to look for non JS assets, primarily css */
 app.use(express.static(path.join(__dirname, 'public')));
+
+/* Create static data for now to pass to Pug */
+app.use(createData);
 
 /* have route file handle all routing */
 app.use('/', routes);
