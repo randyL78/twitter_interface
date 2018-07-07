@@ -10,7 +10,7 @@ const twitData = (req, res, next) => {
   })
 
 
-  const getTweets = new Promise( (resolve, reject) => {
+  const getTweets = new Promise( resolve => {
     T.get('statuses/user_timeline', {count: 5})
       .catch( err => {
         console.log('caught error', err.stack)
@@ -28,8 +28,8 @@ const twitData = (req, res, next) => {
             username: tweet.user.screen_name,
             message : tweet.text,
             time    : "4h",
-            retweets  : tweet.retweet_count,
-            likes     : tweet.favorite_count
+            retweets: tweet.retweet_count,
+            likes   : tweet.favorite_count
           }) 
         });
         return(data)
@@ -39,26 +39,30 @@ const twitData = (req, res, next) => {
       }); 
     });
 
-  const getFollowing = T.get('friends/list', {count: 5})
-    .then( result => {
-
-      result.data.users.forEach(user => {
-        req.data.following.push(
-          {
-            name    : user.name,
-            username: user.screen_name,
-            avatar  : user.profile_image_url,
-            followed: true
-          }
-        )
+  const getFollowing = new Promise( resolve => {
+    T.get('friends/list', {count: 5})
+      .then( result => {
+        const following = [];
+        result.data.users.forEach(user => {
+          following.push(
+            {
+              name    : user.name,
+              username: user.screen_name,
+              avatar  : user.profile_image_url,
+              followed: true
+            }
+          )
+        })
+        resolve(following);
       })
-      // console.log(req.data.following);
-    })
+  })
 
   /* method entry point for twitData */
-  Promise.all([getTweets])
+  Promise.all([getTweets, getFollowing])
     .then( data => {
-      res.render('index', {data: data[0]})
+      pugData = data[0];
+      pugData.following = data[1];
+      res.render('index', {data: pugData})
     })
     
 

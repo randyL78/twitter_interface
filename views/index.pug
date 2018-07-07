@@ -13,8 +13,8 @@ include footer
   .grid-33
     .app--section
       ul.app--user--list
-        //- each following in data.following
-        //-   include cards/following
+        each following in data.following
+          include cards/following
   .grid-33
     .app--section
       ul.app--message--list
