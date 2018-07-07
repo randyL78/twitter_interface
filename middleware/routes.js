@@ -4,11 +4,13 @@
 const express = require('express');
 const router = express.Router();
 
-// GET home route
-router.get('/', (req, res, next)  => {
-  const data =  req.data ||  {name: "User"};
+const twitData = require("./twitData");
 
-  res.render('index', {data});
-})
+router.get('/', twitData);
+
+router.get('*', (req, res, next) => {
+  const data =   req.data ||  {name: "User"}
+  res.render('notFound', {data})
+});
 
 module.exports = router;

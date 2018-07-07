@@ -1,9 +1,11 @@
+- var avatar = data.avatar || "images/f-spore.png"
+
 footer.app--tweet
   form(action="")
     .circle--fluid
       .circle--fluid--cell.circle--fluid--primary.align-bottom.app--tweet--post
-        .app--avatar(style="background-image: url(images/m-spore.png ")
-          img(src="images/m-spore.png", alt="Randy Layne")
+        .app--avatar(style=`background-image: url(${avatar} `)
+          img(src=avatar, alt="Randy Layne")
         textarea#tweet-textarea.circle--textarea--input(name="tweetContent")
         strong#tweet-char.app--tweet--char 140
       .circle--fluid--cell.align-bottom
