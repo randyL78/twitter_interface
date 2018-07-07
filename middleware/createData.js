@@ -1,48 +1,29 @@
 const createData = (req, res, next) => {
   const data = {
-    name : "Joe Schmoe",
-    timeline : [
-      {
-        name      : "Joane Spore",
-        username  : "@jillspore",
-        message   : "It's time I come clean about a few things: The pretzel is my favorite chip.",
-        time      : "4h",
-        retweets  : 34,
-        likes     : 87
-      },
-      {
-        name      : "Mark Spore",
-        username  : "@mkspore",
-        message   : "My wife is crazy if she thinks a pretzel is a chip.",
-        time      : "3h",
-        retweets  : 4,
-        likes     : 132
-      },
-    ],
     following : [
       {
         name    : "Mark Spore",
-        username: "@mkspore",
+        username: "mkspore",
         followed: true
       },
       {
         name    : "Jill Spore",
-        username: "@jillspore",
+        username: "jillspore",
         followed: true
       },
       {
         name    : "Narwell Seaford",
-        username: "@oceanswimming",
+        username: "oceanswimming",
         followed: false
       },
       {
         name    : "Sandy Fisher",
-        username: "@sandyfisher",
+        username: "sandyfisher",
         followed: true
       },
       {
         name    : "Lexi Layne",
-        username: "@lexiloulayne",
+        username: "lexiloulayne",
         followed: true
       },
     ],

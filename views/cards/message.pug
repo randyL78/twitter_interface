@@ -1,4 +1,4 @@
--var avatar = data.avatar
+-var avatar = "images/f-spore.png"
 -var listItem = `app--message--me`
 if message.them
   - listItem = `app--message`
@@ -9,8 +9,8 @@ else
     - avatar = data.avatar
 
 li(class= `${listItem}`)
-  .app--avatar(style="background-image: url(images/f-spore.png)")
-    img(src="images/f-spore.png", alt="")
+  .app--avatar(style=`background-image: url(${avatar})`)
+    img(src=avatar, alt="")
   p.app--message--text #{message.message}
   p.app--message--timestamp #{message.time} hours ago
 

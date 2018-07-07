@@ -8,7 +8,7 @@ li
     .app--avatar(style=`background-image: url(${avatar})`)
       img(src=`${avatar}`, alt=`${timePost.name}`)
     h4 #{timePost.name} 
-    span #{timePost.username}
+    span @#{timePost.username}
   p #{timePost.message}
   ul.app--tweet--actions.circle--list--inline
     li
