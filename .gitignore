@@ -86,7 +86,4 @@ $RECYCLE.BIN/
 .com.apple.timemachine.donotpresent
 
 # project specific files
-data/
-.data/
-.data/*
-*.log
+/middleware/config.js
