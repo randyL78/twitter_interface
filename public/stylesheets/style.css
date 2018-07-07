@@ -1640,6 +1640,7 @@ li:only-child .circle--clone--remove {
 }
 /* line 22, ../sass/circle/components/_forms.sass */
 .circle--textarea--input {
+  resize: none;
   height: 50px;
   min-height: 0;
   padding: 11px 15px;

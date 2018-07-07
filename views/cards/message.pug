@@ -1,0 +1,16 @@
+-var avatar = "images/f-spore.png"
+-var listItem = `app--message--me`
+if message.them
+  - listItem = `app--message`
+  if data.directMessage.avatar
+    - avatar = data.directMessage.avatar
+else
+  if data.avatar
+    - avatar = data.avatar
+
+li(class= `${listItem}`)
+  .app--avatar(style="background-image: url(images/f-spore.png)")
+    img(src="images/f-spore.png", alt="")
+  p.app--message--text #{message.message}
+  p.app--message--timestamp #{message.time} hours ago
+

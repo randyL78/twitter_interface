@@ -13,21 +13,16 @@ include footer
   .grid-33
     .app--section
       ul.app--user--list
-        include cards/following
-        include cards/following
-        include cards/following
-        include cards/following
-        include cards/following
+        each following in data.following
+          include cards/following
   .grid-33
     .app--section
       ul.app--message--list
         li
           h3 Conversation with 
-            a Jill Spore
+            a #{data.directMessage.name}
           ul.app--message--conversation
-            include cards/message-from
-            include cards/message-to
-            include cards/message-from
-            include cards/message-from
-            include cards/message-to
+            each message in data.directMessage.messages
+              include cards/message
+
 
