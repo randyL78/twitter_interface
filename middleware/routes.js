@@ -11,7 +11,7 @@ router.get('/', twitData);
 
 /* for any other route, display a 404-like page */
 router.get('*', (req, res) => {
-  const data =   req.data ||  {name: "User"}
+  const data = req.data ||  {username: "@User"}
   res.render('notFound', {data})
 });
 

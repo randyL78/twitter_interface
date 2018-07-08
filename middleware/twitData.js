@@ -2,11 +2,12 @@ const twitData = (req, res, next) => {
   const Twit = require('twit');
   const config = require('./config');
 
+  /* Interface for comminicating with twitter API */
   var T = new Twit({
-    consumer_key: config.consumer_key,
-    consumer_secret: config.consumer_secret,
-    access_token: config.access_token,
-    access_token_secret: config.access_token_secret
+    consumer_key        : config.consumer_key,
+    consumer_secret     : config.consumer_secret,
+    access_token        : config.access_token,
+    access_token_secret : config.access_token_secret
   })
 
   /* Promise for getting twits on the main timeline and the user's info */
@@ -95,6 +96,10 @@ const twitData = (req, res, next) => {
       pugData.following = data[1];
       pugData.directMessage = data[2];
       res.render('index', {data: pugData})
+    })
+    .catch( err => {
+      console.log("Promise.all Caught error", err.stack);
+      res.render('notFound', {username: "@user"});
     })
 }
 
