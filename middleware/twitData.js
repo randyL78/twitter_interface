@@ -18,7 +18,9 @@ const twitData = (req, res, next) => {
       .then( result => {
         const data = {
           avatar    : result.data[0].user.profile_image_url,
+          banner    : result.data[0].user.profile_banner_url,
           name      : result.data[0].user.name,
+          username  : result.data[0].user.screen_name,
           timeline  : []
         };
         result.data.forEach(tweet => {
@@ -32,11 +34,8 @@ const twitData = (req, res, next) => {
             likes   : tweet.favorite_count
           }) 
         });
-        return(data)
-      })
-      .then( data => {
         resolve(data);
-      }); 
+      })
     });
 
   const getFollowing = new Promise( resolve => {
@@ -57,15 +56,43 @@ const twitData = (req, res, next) => {
       })
   })
 
+  const getMessages = new Promise( resolve => {
+    T.get('direct_messages/events/list', {count: 5})
+      .then( result => {
+        const directMessage = {
+          name    : "Sandy",
+          messages: []
+        }
+        resolve(directMessage);
+      })
+      .catch( err => {
+        console.log('caught error', err.stack)
+        resolve ({
+          name: "Sandy",
+          messages : [
+              {
+                message : "How are things",
+                time    : 3,
+                them    : true
+              },
+              {
+                message : "They're good!",
+                time    : 3,
+                them    : false
+              }
+            ]
+        })
+      })
+  }) 
+
   /* method entry point for twitData */
-  Promise.all([getTweets, getFollowing])
+  Promise.all([getTweets, getFollowing, getMessages])
     .then( data => {
       pugData = data[0];
       pugData.following = data[1];
+      pugData.directMessage = data[2];
       res.render('index', {data: pugData})
     })
-    
-
 }
 
 module.exports = twitData;

@@ -20,9 +20,9 @@ include footer
       ul.app--message--list
         li
           h3 Conversation with 
-            //- a #{data.directMessage.name}
+            a #{data.directMessage.name}
           ul.app--message--conversation
-            //- each message in data.directMessage.messages
-            //-   include cards/message
+            each message in data.directMessage.messages
+              include cards/message
 
 
