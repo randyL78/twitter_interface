@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 
 // Custom middleware imports 
-const routes = require("./middleware/routes");
+const twitData = require("./middleware/twitData");
 
 // Global variables
 const app = express();
@@ -17,8 +17,33 @@ app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* have route file handle all routing */
-app.use('/', routes);
+// app.use(routes);
 
+/* redirect to "home" url at root */
+app.get('/', (req, res) => res.redirect('/home'))
+
+/* pass control to twitData to fetch twitter API data */
+app.get('/home', twitData)
+
+/* any other routes should cause a 404 */
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+})
+
+/* catch any errors, decide what to display based on err status */
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  const data = req.data ||  {username: "@User"};
+  if (err.status = 404) {
+    res.render('notFound', {data})
+  } else {
+    res.render('error', {data})
+  }
+})
+
+/* Start the application on the set prot */
 app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
