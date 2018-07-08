@@ -6,9 +6,11 @@ const router = express.Router();
 
 const twitData = require("./twitData");
 
+/* handle the base route  */
 router.get('/', twitData);
 
-router.get('*', (req, res, next) => {
+/* for any other route, display a 404-like page */
+router.get('*', (req, res) => {
   const data =   req.data ||  {name: "User"}
   res.render('notFound', {data})
 });

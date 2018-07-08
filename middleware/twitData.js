@@ -9,7 +9,7 @@ const twitData = (req, res, next) => {
     access_token_secret: config.access_token_secret
   })
 
-
+  /* Promise for getting twits on the main timeline and the user's info */
   const getTweets = new Promise( resolve => {
     T.get('statuses/user_timeline', {count: 5})
       .catch( err => {
@@ -38,6 +38,7 @@ const twitData = (req, res, next) => {
       })
     });
 
+  /* Promise for getting people user is following */
   const getFollowing = new Promise( resolve => {
     T.get('friends/list', {count: 5})
       .then( result => {
@@ -56,8 +57,9 @@ const twitData = (req, res, next) => {
       })
   })
 
+  /* Promise for getting direct messages */
   const getMessages = new Promise( resolve => {
-    T.get('direct_messages/events/list', {count: 5})
+    T.get('direct_messages/events/list')
       .then( result => {
         const directMessage = {
           name    : "Sandy",
