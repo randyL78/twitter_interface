@@ -23,6 +23,9 @@ include footer
           h3 Conversation with 
             a #{data.directMessage.name}
           ul.app--message--conversation
+            if data.directMessage.messages.length < 5
+              h3 This is the beginning of your conversation with 
+                a #{data.directMessage.name}
             each message in data.directMessage.messages
               include cards/message
 
