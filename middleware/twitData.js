@@ -2,6 +2,25 @@ const twitData = (req, res, next) => {
   const Twit = require('twit');
   const config = require('./config');
 
+  /* Time formator for the Direct Message section */
+  const dmTime = time => {
+    let secondsAgo = Math.floor((parseInt(Date.now()) - parseInt(time))/1000 );
+    if (secondsAgo < 60) 
+      return secondsAgo + " seconds ago";
+    else if (secondsAgo/60 < 60)
+      return Math.floor(secondsAgo/60) + " minutes ago";
+    else if (secondsAgo/(60 * 60) < 24) 
+      return Math.floor(secondsAgo/(60 * 60)) + " hours ago";
+    else 
+      return Math.floor(secondsAgo/(60 * 60 * 24)) + " days ago";
+  }
+
+  /* Time formator for the Timeline section */
+  const tlTime = time => {
+    return time;
+  }
+
+
   /* Interface for comminicating with twitter API */
   var T = new Twit({
     consumer_key        : config.consumer_key,
@@ -30,7 +49,7 @@ const twitData = (req, res, next) => {
             name    : tweet.user.name,
             username: tweet.user.screen_name,
             message : tweet.text,
-            time    : "4h",
+            time    : tlTime(tweet.created_at),
             retweets: tweet.retweet_count,
             likes   : tweet.favorite_count
           }) 
@@ -126,32 +145,37 @@ const twitData = (req, res, next) => {
         const id = result.directMessage.user.id
         let messages = result.dms.data.events;
         messages = messages
+          /* Return only the elments in the array that contain
+             The person user is conversing with, either as a sender or reciever */
           .filter(message => {
             if (message.message_create.target.recipient_id === id ||
-                message.message_create.sender_id    === id)
+                message.message_create.sender_id  === id)
               {
                 return message;
               }
           })
+          /* Reformat the message array to be used by Pug */
           .map(message => {
             return {
               message : message.message_create.message_data.text,
-              time : message.created_timestamp,
+              time : dmTime(message.created_timestamp),
               them : id === message.message_create.sender_id
             }
           })
+          /* Put the newest DMs last */
           .reverse()
 
-
+          /* If there are more than 5DMs in specific conversation, 
+             Get only the 5 most recent */
           if (messages.length > 5) {
-            messages = messages.slice(-4);
+            messages = messages.slice(-5);
           }
 
           result.directMessage.messages = messages;
         return result;
       })
       .then(result => {
-        /* Get the information of person user is conversing with */
+        /* Get the information about person user is conversing with */
         return Promise.resolve( 
           getUserById(result.directMessage.user.id)
             .then(dmUser => {
