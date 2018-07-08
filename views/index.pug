@@ -21,11 +21,11 @@ include footer
       ul.app--message--list
         li
           h3 Conversation with 
-            a #{data.directMessage.name}
+            a #{data.directMessage.user.name}
           ul.app--message--conversation
             if data.directMessage.messages.length < 5
               h3 This is the beginning of your conversation with 
-                a #{data.directMessage.name}
+                a #{data.directMessage.user.name}
             each message in data.directMessage.messages
               include cards/message
 

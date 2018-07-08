@@ -39,6 +39,22 @@ const twitData = (req, res, next) => {
       })
     });
 
+  /* Promise for getting main user's information */
+  const getMainInfo = new Promise( resolve => {
+    T.get('account/verify_credentials', { skip_status: true })
+      .catch( err => console.log('caught error', err.stack))
+      .then( result => {
+        const user = {
+          name    : result.data.name,
+          username: result.data.screen_name,
+          id      : result.data.id,
+          avatar  : result.data.profile_image_url
+        }
+        resolve(user);
+      })
+
+  })
+
   /* Promise for getting people user is following */
   const getFollowing = new Promise( resolve => {
     T.get('friends/list', {count: 5})
@@ -58,40 +74,104 @@ const twitData = (req, res, next) => {
       })
   })
 
-  /* Promise for getting direct messages */
-  const getMessages = new Promise( resolve => {
-    T.get('direct_messages/events/list')
+  /* Promise for getting user information from an id */
+  const getUserById = user_id => new Promise( resolve => {
+    T.get('users/lookup', {user_id})
       .then( result => {
-        const directMessage = {
-          name    : "Sandy",
-          messages: []
+        const data = {};
+        data.user = {
+          name  : result.data[0].name,
+          avatar: result.data[0].profile_image_url,
+          id    : user_id
         }
-        resolve(directMessage);
+        resolve(data);
       })
-      .catch( err => {
-        console.log('caught error', err.stack)
-        /* Create fake data on err until I can get permission problem figured out */
-        resolve ({
-          name: "Sandy",
-          messages : [
-              {
-                message : "How are things",
-                time    : 3,
-                them    : true
-              },
-              {
-                message : "They're good!",
-                time    : 3,
-                them    : false
-              }
-            ]
-        })
+  })
+
+  /* Promise for getting and filtering direct messages */
+  const getMessages = new Promise( resolve => {
+    getMainInfo
+      .then( result => {
+        return Promise.resolve(
+        T.get('direct_messages/events/list')
+          .then( dms => {
+            const directMessage = {
+              user : {}
+            }
+
+            /* Get details of most recent DM */
+            const recepient = dms.data.events[0].message_create.target.recipient_id;
+            const sender = dms.data.events[0].message_create.target.sender_id;
+
+            /* find out the id of the person opposite the user */
+            directMessage.user.id =  (result.id === recepient)
+              ? sender
+              : recepient
+             
+            /* text of most recent DM */
+            // console.log(dms.data.events[0].message_create.message_data.text);
+            
+            return {directMessage, dms}
+          })
+          .catch( err => {
+            console.log('caught error', err.stack)
+          })
+        )
       })
+      .then(result => {
+        /* Get the user id of the first direct message
+           So that we can use it to filter the other direct messages by */
+        return Promise.resolve( 
+          getUserById(result.directMessage.user.id)
+            .then(dmUser => {
+              result.directMessage.user = dmUser.user
+              return result;
+            })
+        )
+      })
+      .then(result => {
+        result.directMessage.messages = [
+          {
+            message : "Hey There!",
+            time : 3,
+            them : true
+          },
+          {
+            message : "How are you?",
+            time : 4,
+            them : false
+          }          
+        ]
+        resolve(result.directMessage);
+      })
+
+    // getUserById('1015703179013566465')
+    // .then(result => {
+    //   directMessage.user = result;
+    //   return result;
+    // })
+    // .then( data => {
+    //   directMessage.messages = [
+    //     {
+    //       message : "Hey There!",
+    //       time : 3,
+    //       them : true
+    //     },
+    //     {
+    //       message : "How are you?",
+    //       time : 4,
+    //       them : false
+    //     }
+    //   ]
+    // })
+    // .then(resolve(directMessage));
+   
   }) 
 
   /* method entry point for twitData */
   Promise.all([getTweets, getFollowing, getMessages])
     .then( data => {
+      console.log(data[2])
       pugData = data[0];
       pugData.following = data[1];
       pugData.directMessage = data[2];

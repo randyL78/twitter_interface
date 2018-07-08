@@ -3,8 +3,8 @@
 -var listItem = `app--message--me`
 if message.them
   - listItem = `app--message`
-  if data.directMessage.avatar
-    - avatar = data.directMessage.avatar
+  if data.directMessage.user.avatar
+    - avatar = data.directMessage.user.avatar
 else
   if data.avatar
     - avatar = data.avatar
