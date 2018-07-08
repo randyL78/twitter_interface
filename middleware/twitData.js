@@ -67,6 +67,7 @@ const twitData = (req, res, next) => {
       })
       .catch( err => {
         console.log('caught error', err.stack)
+        /* Create fake data on err until I can get permission problem figured out */
         resolve ({
           name: "Sandy",
           messages : [
