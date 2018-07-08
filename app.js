@@ -16,9 +16,6 @@ app.set('view engine', 'pug');
 /* Set location to look for non JS assets, primarily css */
 app.use(express.static(path.join(__dirname, 'public')));
 
-/* have route file handle all routing */
-// app.use(routes);
-
 /* redirect to "home" url at root */
 app.get('/', (req, res) => res.redirect('/home'))
 
