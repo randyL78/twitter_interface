@@ -10,7 +10,7 @@ const twitData = (req, res, next) => {
     access_token_secret : config.access_token_secret
   })
 
-  /* Promise for getting twits on the main timeline and the user's info */
+  /* Promise for getting tweets on the main timeline and the user's info */
   const getTweets = new Promise( resolve => {
     T.get('statuses/user_timeline', {count: 5})
       .catch( err => {
@@ -47,12 +47,12 @@ const twitData = (req, res, next) => {
         const user = {
           name    : result.data.name,
           username: result.data.screen_name,
+          banner  : result.data.profile_banner_url,
           id      : result.data.id,
           avatar  : result.data.profile_image_url
         }
         resolve(user);
       })
-
   })
 
   /* Promise for getting people user is following */
@@ -90,8 +90,11 @@ const twitData = (req, res, next) => {
 
   /* Promise for getting and filtering direct messages */
   const getMessages = new Promise( resolve => {
+    /* Get main user info to compare by when filtering messages */
     getMainInfo
       .then( result => {
+        /* Pulls the last 30 days worth of DMs from twitter 
+           Defaults to 20 most recent */
         return Promise.resolve(
         T.get('direct_messages/events/list')
           .then( dms => {
@@ -103,14 +106,15 @@ const twitData = (req, res, next) => {
             const recepient = dms.data.events[0].message_create.target.recipient_id;
             const sender = dms.data.events[0].message_create.target.sender_id;
 
-            /* find out the id of the person opposite the user */
+            /* find out the id of the person opposite the user
+               this will be person user is conversing with, and the person 
+               whose DMs we will want to filter by */
             directMessage.user.id =  (result.id === recepient)
               ? sender
               : recepient
              
-            /* text of most recent DM */
-            // console.log(dms.data.events[0].message_create.message_data.text);
-            
+            /* return the beginning of our directMessage object
+               as well as dms object */  
             return {directMessage, dms}
           })
           .catch( err => {
@@ -119,8 +123,35 @@ const twitData = (req, res, next) => {
         )
       })
       .then(result => {
-        /* Get the user id of the first direct message
-           So that we can use it to filter the other direct messages by */
+        const id = result.directMessage.user.id
+        let messages = result.dms.data.events;
+        messages = messages
+          .filter(message => {
+            if (message.message_create.target.recipient_id === id ||
+                message.message_create.sender_id    === id)
+              {
+                return message;
+              }
+          })
+          .map(message => {
+            return {
+              message : message.message_create.message_data.text,
+              time : message.created_timestamp,
+              them : id === message.message_create.sender_id
+            }
+          })
+          .reverse()
+
+
+          if (messages.length > 5) {
+            messages = messages.slice(-4);
+          }
+
+          result.directMessage.messages = messages;
+        return result;
+      })
+      .then(result => {
+        /* Get the information of person user is conversing with */
         return Promise.resolve( 
           getUserById(result.directMessage.user.id)
             .then(dmUser => {
@@ -130,48 +161,13 @@ const twitData = (req, res, next) => {
         )
       })
       .then(result => {
-        result.directMessage.messages = [
-          {
-            message : "Hey There!",
-            time : 3,
-            them : true
-          },
-          {
-            message : "How are you?",
-            time : 4,
-            them : false
-          }          
-        ]
         resolve(result.directMessage);
-      })
-
-    // getUserById('1015703179013566465')
-    // .then(result => {
-    //   directMessage.user = result;
-    //   return result;
-    // })
-    // .then( data => {
-    //   directMessage.messages = [
-    //     {
-    //       message : "Hey There!",
-    //       time : 3,
-    //       them : true
-    //     },
-    //     {
-    //       message : "How are you?",
-    //       time : 4,
-    //       them : false
-    //     }
-    //   ]
-    // })
-    // .then(resolve(directMessage));
-   
+      })   
   }) 
 
   /* method entry point for twitData */
   Promise.all([getTweets, getFollowing, getMessages])
     .then( data => {
-      console.log(data[2])
       pugData = data[0];
       pugData.following = data[1];
       pugData.directMessage = data[2];
