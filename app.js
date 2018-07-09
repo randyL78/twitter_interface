@@ -2,12 +2,21 @@
 const express = require('express');
 const path = require('path');
 
+
 // Custom middleware imports 
 const routes = require("./middleware/routes");
 
 // Global variables
 const app = express();
+const expressWs = require('express-ws')(app);
 const port = 3000;
+
+/* Try to open websocket here */
+app.ws('/', (ws, req) => {
+  ws.on('message', msg => {
+    console.log(msg)
+  })
+})
 
 /* Set Express to render pug/jade */
 app.set('views', path.join(__dirname, 'views'));
