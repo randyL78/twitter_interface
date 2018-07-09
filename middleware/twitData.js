@@ -4,7 +4,7 @@ const twitData = (req, res, next) => {
 
   /* Time formatter for the Direct Message section */
   const dmTime = time => {
-    let secondsAgo = Math.floor((parseInt(Date.now()) - parseInt(time))/1000 );
+    let secondsAgo = Math.floor((Date.now() - time)/1000 );
     let minutesAgo = Math.floor(secondsAgo/60);
     let hoursAgo = Math.floor(minutesAgo/60);
     let daysAgo = Math.floor(hoursAgo/24);
@@ -20,7 +20,19 @@ const twitData = (req, res, next) => {
 
   /* Time formatter for the Timeline section */
   const tlTime = time => {
-    return time;
+    let secondsAgo = Math.floor((Date.now() - Date.parse(time))/1000 );
+    let minutesAgo = Math.floor(secondsAgo/60);
+    let hoursAgo = Math.floor(minutesAgo/60);
+    let daysAgo = Math.floor(hoursAgo/24);
+    if (secondsAgo < 60) 
+      return secondsAgo + `s`;
+    else if (minutesAgo < 60)
+      return minutesAgo + `m`;
+    else if (hoursAgo < 24) 
+      return hoursAgo + `h`;
+    else 
+      return daysAgo + `d`;
+    return dmTime(time);
   }
 
 
