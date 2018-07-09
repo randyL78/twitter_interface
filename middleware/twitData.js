@@ -2,7 +2,7 @@ const twitData = (req, res, next) => {
   const Twit = require('twit');
   const config = require('./config');
 
-  /* Time formator for the Direct Message section */
+  /* Time formatter for the Direct Message section */
   const dmTime = time => {
     let secondsAgo = Math.floor((parseInt(Date.now()) - parseInt(time))/1000 );
     if (secondsAgo < 60) 
@@ -15,7 +15,7 @@ const twitData = (req, res, next) => {
       return Math.floor(secondsAgo/(60 * 60 * 24)) + " days ago";
   }
 
-  /* Time formator for the Timeline section */
+  /* Time formatter for the Timeline section */
   const tlTime = time => {
     return time;
   }
@@ -30,11 +30,8 @@ const twitData = (req, res, next) => {
   })
 
   /* Promise for getting tweets on the main timeline and the user's info */
-  const getTweets = new Promise( resolve => {
+  const getTweets = new Promise( (resolve, reject) => {
     T.get('statuses/user_timeline', {count: 5})
-      .catch( err => {
-        console.log('caught error', err.stack)
-      })
       .then( result => {
         const data = {
           avatar    : result.data[0].user.profile_image_url,
@@ -56,12 +53,15 @@ const twitData = (req, res, next) => {
         });
         resolve(data);
       })
+      .catch( err => {
+        resolve();
+        console.log("Can't connect to timeline")
+      })
     });
 
   /* Promise for getting main user's information */
-  const getMainInfo = new Promise( resolve => {
+  const getMainInfo = new Promise( (resolve, reject) => {
     T.get('account/verify_credentials', { skip_status: true })
-      .catch( err => console.log('caught error', err.stack))
       .then( result => {
         const user = {
           name    : result.data.name,
@@ -72,10 +72,14 @@ const twitData = (req, res, next) => {
         }
         resolve(user);
       })
+      .catch( err => {  
+        console.log("Can't connect to user api")
+        resolve();
+      })
   })
 
   /* Promise for getting people user is following */
-  const getFollowing = new Promise( resolve => {
+  const getFollowing = new Promise( (resolve, reject) => {
     T.get('friends/list', {count: 5})
       .then( result => {
         const following = [];
@@ -91,10 +95,14 @@ const twitData = (req, res, next) => {
         })
         resolve(following);
       })
+      .catch(err => {
+        console.log("Can't connect to friends api")
+        resolve();
+      })
   })
 
   /* Promise for getting user information from an id */
-  const getUserById = user_id => new Promise( resolve => {
+  const getUserById = user_id => new Promise( (resolve, reject) => {
     T.get('users/lookup', {user_id})
       .then( result => {
         const data = {};
@@ -105,6 +113,11 @@ const twitData = (req, res, next) => {
         }
         resolve(data);
       })
+      .catch( err => {
+       console.log("Can't connect to user api")
+       resolve();
+      })
+
   })
 
   /* Promise for getting and filtering direct messages */
@@ -137,7 +150,8 @@ const twitData = (req, res, next) => {
             return {directMessage, dms}
           })
           .catch( err => {
-            console.log('caught error', err.stack)
+            console.log("Can't connect to Direct Message api")
+            resolve();
           })
         )
       })
@@ -186,6 +200,9 @@ const twitData = (req, res, next) => {
       })
       .then(result => {
         resolve(result.directMessage);
+      })
+      .catch(err => {
+        resolve();
       })   
   }) 
 
@@ -198,8 +215,8 @@ const twitData = (req, res, next) => {
       res.render('index', {data: pugData})
     })
     .catch( err => {
-      console.log("Promise.all Caught error", err.stack);
-      res.render('notFound', {username: "@user"});
+      console.log("Promise.all Caught error", err.message);
+      next();
     })
 }
 

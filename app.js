@@ -23,15 +23,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 
 /* catch any errors, decide what to display based on err status */
-// app.use((err, req, res, next) => {
-//   console.log(err.status);
-//   const data = req.data ||  {username: "@User"};
-//   if (err.status === 404) {
-//     res.render('notFound', {data})
-//   } else {
-//     res.render('error', {data})
-//   }
-// })
+app.use((err, req, res, next) => {  
+  if (err.status) {
+    console.log(err.stack);
+    const data = req.data ||  {username: "@User"};
+    res.render('error', {data})
+  }
+})
 
 /* Start the application on the set prot */
 app.listen(port, () => {
