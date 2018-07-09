@@ -1,6 +1,15 @@
-const twitData = (req, res, next) => {
-  const Twit = require('twit');
-  const config = require('./config');
+const Twit = require('twit');
+const config = require('./config');
+
+/* Interface for comminicating with twitter API */
+const T = new Twit({
+  consumer_key        : config.consumer_key,
+  consumer_secret     : config.consumer_secret,
+  access_token        : config.access_token,
+  access_token_secret : config.access_token_secret
+})
+
+const getData = (req, res, next) => {
 
   /* Time formatter for the Direct Message section */
   const dmTime = time => {
@@ -36,13 +45,15 @@ const twitData = (req, res, next) => {
   }
 
 
-  /* Interface for comminicating with twitter API */
-  var T = new Twit({
-    consumer_key        : config.consumer_key,
-    consumer_secret     : config.consumer_secret,
-    access_token        : config.access_token,
-    access_token_secret : config.access_token_secret
-  })
+
+
+  /* Post a tweet to twitter,
+     Use Promise to comfirm submission so page can update with new tweet */
+  const postTweet = msg => {new Promise( (resolve, reject) => {
+    T.post('statuses/update', {status: msg}, (err, data, response) => {
+      console.log(data);
+    })
+  })}
 
   /* Promise for getting tweets on the main timeline and the user's info */
   const getTweets = new Promise( (resolve, reject) => {
@@ -234,5 +245,29 @@ const twitData = (req, res, next) => {
       next();
     })
 }
+ /* Post a tweet to twitter,
+Use Promise to comfirm submission so page can update with new tweet */
+const postTweet = msg => {
+  return T.post('statuses/update', {status: msg})
+    .catch(err => {
+      console.log("Unable to post tweet", err);
+      return {fail: true}
+    })
+    .then(result => {
+      let data = {}
+      if (result.fail) {
+        data = {fail: true}
+      } else {
+        data = {
+          fail    : false,
+          message : result.data.text,
+          avatar  : result.data.user.profile_image_url,
+          name    : result.data.user.name,
+          username: result.data.user.screen_name
+        }
+      }
+      return(data);
+    })
+}
 
-module.exports = twitData;
+module.exports = {getData, postTweet};

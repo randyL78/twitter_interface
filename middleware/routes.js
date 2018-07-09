@@ -14,7 +14,7 @@ const twitData = require('./twitData');
 // })
 
 /* Main route, gathers data from twitter and displays page */
-router.get('/', twitData);
+router.get('/', twitData.getData);
 
 /* This route gets hit only if something goes wrong and will display an error page */
 router.get('/', (req, res) => res.render('error', {data: "name: user"}));

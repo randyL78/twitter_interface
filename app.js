@@ -5,6 +5,7 @@ const path = require('path');
 
 // Custom middleware imports 
 const routes = require("./middleware/routes");
+const twitData = require("./middleware/twitData");
 
 // Global variables
 const app = express();
@@ -13,8 +14,16 @@ const port = 3000;
 
 /* Try to open websocket here */
 app.ws('/', (ws, req) => {
+  /* Recieve message from client and post the tweet */
   ws.on('message', msg => {
-    console.log(msg)
+   new Promise((resolve, reject) => {
+      resolve(twitData.postTweet(msg));
+    }).then(data => {
+      data.type = "tweetConfirmation";
+      /* Convert send message to a string */
+      ws.send(JSON.stringify(data));
+    } );
+
   })
 })
 
@@ -24,9 +33,6 @@ app.set('view engine', 'pug');
 
 /* Set location to look for non JS assets, primarily css */
 app.use(express.static(path.join(__dirname, 'public')));
-
-/* pass control to twitData to fetch twitter API data */
-// app.get('/home', twitData)
 
 /* redirect route handling to routes.js */
 app.use('/', routes);
