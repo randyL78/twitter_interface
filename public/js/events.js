@@ -40,6 +40,7 @@ ws.onmessage = e => {
   if (result.type === "tweetConfirmation" && !result.fail) {
     const tweetList = document.querySelector("ul.app--tweet--list");
     const newTweet = document.createElement('li');
+    
     newTweet.innerHTML = `
       <strong class="app--tweet--timestamp">now</strong>
         <a class="app--tweet--author">
@@ -86,6 +87,9 @@ ws.onmessage = e => {
           </li>
         </ul>
     `
+    if (tweetList.childElementCount >= 5) {
+      tweetList.removeChild(tweetList.firstElementChild);
+    }
     tweetList.appendChild(newTweet);
   } else {
     console.log(result);
