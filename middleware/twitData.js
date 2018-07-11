@@ -56,7 +56,7 @@ const getData = (req, res, next) => {
   })}
 
   /* Promise for getting tweets on the main timeline and the user's info */
-  const getTweets = new Promise( (resolve, reject) => {
+  const getTweets = new Promise( (resolve) => {
     T.get('statuses/user_timeline', {count: 5})
       .then( result => {
         const data = {
@@ -86,7 +86,7 @@ const getData = (req, res, next) => {
     });
 
   /* Promise for getting main user's information */
-  const getMainInfo = new Promise( (resolve, reject) => {
+  const getMainInfo = new Promise( (resolve) => {
     T.get('account/verify_credentials', { skip_status: true })
       .then( result => {
         const user = {
@@ -105,7 +105,7 @@ const getData = (req, res, next) => {
   })
 
   /* Promise for getting people user is following */
-  const getFollowing = new Promise( (resolve, reject) => {
+  const getFollowing = new Promise( (resolve) => {
     T.get('friends/list', {count: 5})
       .then( result => {
         const following = [];
@@ -128,7 +128,7 @@ const getData = (req, res, next) => {
   })
 
   /* Promise for getting user information from an id */
-  const getUserById = user_id => new Promise( (resolve, reject) => {
+  const getUserById = user_id => new Promise( (resolve) => {
     T.get('users/lookup', {user_id})
       .then( result => {
         const data = {};
@@ -234,10 +234,9 @@ const getData = (req, res, next) => {
 
   /* method entry point for twitData */
   Promise.all([getTweets, getFollowing, getMessages])
-    .then( data => {
-      pugData = data[0];
-      pugData.following = data[1];
-      pugData.directMessage = data[2];
+    .then( ([pugData, following, directMessage]) => {
+      pugData.following = following;
+      pugData.directMessage = directMessage;
       res.render('index', {data: pugData})
     })
     .catch( err => {

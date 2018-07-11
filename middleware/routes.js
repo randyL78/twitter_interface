@@ -6,13 +6,6 @@ const router = express.Router();
 // custom middleware
 const twitData = require('./twitData');
 
-/* route for ws socket */
-// router.ws('/echo', (ws, req) => {
-//   ws.on('message', msg => {
-//     ws.send(msg);
-//   })
-// })
-
 /* Main route, gathers data from twitter and displays page */
 router.get('/', twitData.getData);
 
