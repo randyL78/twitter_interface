@@ -164,24 +164,6 @@ const getData = (req, res, next) => {
               ? sender
               : recepient
 
-            /* debugging DM issues */
-            console.log(result.id === recepient);
-            console.log(directMessage.user.id + " " + result.id);
-            getUserById(sender)
-              .then(dmUser => {
-                console.log(dmUser);
-                return dmUser;
-              })
-            getUserById(recepient)
-              .then(dmUser => {
-                console.log(dmUser);
-                return dmUser;
-              })
-
-           console.log(result)
-            /* end DM debugging issues */ 
-
-
             /* return the beginning of our directMessage object
                as well as dms object */  
             return {directMessage, dms}
