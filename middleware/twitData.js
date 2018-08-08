@@ -45,16 +45,6 @@ const getData = (req, res, next) => {
   }
 
 
-
-
-  /* Post a tweet to twitter,
-     Use Promise to comfirm submission so page can update with new tweet */
-  const postTweet = msg => {new Promise( (resolve, reject) => {
-    T.post('statuses/update', {status: msg}, (err, data, response) => {
-      console.log(data);
-    })
-  })}
-
   /* Promise for getting tweets on the main timeline and the user's info */
   const getTweets = new Promise( (resolve) => {
     T.get('statuses/user_timeline', {count: 5})
@@ -93,7 +83,7 @@ const getData = (req, res, next) => {
           name    : result.data.name,
           username: result.data.screen_name,
           banner  : result.data.profile_banner_url,
-          id      : result.data.id,
+          id      : result.data.id_str,
           avatar  : result.data.profile_image_url
         }
         resolve(user);
@@ -133,9 +123,10 @@ const getData = (req, res, next) => {
       .then( result => {
         const data = {};
         data.user = {
-          name  : result.data[0].name,
-          avatar: result.data[0].profile_image_url,
-          id    : user_id
+          name        : result.data[0].name,
+          avatar      : result.data[0].profile_image_url,
+          id          : user_id,
+          screen_name : result.data[0].screen_name
         }
         resolve(data);
       })
@@ -162,7 +153,9 @@ const getData = (req, res, next) => {
 
             /* Get details of most recent DM */
             const recepient = dms.data.events[0].message_create.target.recipient_id;
-            const sender = dms.data.events[0].message_create.target.sender_id;
+            const sender = dms.data.events[0].message_create.sender_id;
+
+            console.log(recepient + " " + sender);
 
             /* find out the id of the person opposite the user
                this will be person user is conversing with, and the person 
@@ -170,20 +163,39 @@ const getData = (req, res, next) => {
             directMessage.user.id =  (result.id === recepient)
               ? sender
               : recepient
-             
+
+            /* debugging DM issues */
+            console.log(result.id === recepient);
+            console.log(directMessage.user.id + " " + result.id);
+            getUserById(sender)
+              .then(dmUser => {
+                console.log(dmUser);
+                return dmUser;
+              })
+            getUserById(recepient)
+              .then(dmUser => {
+                console.log(dmUser);
+                return dmUser;
+              })
+
+           console.log(result)
+            /* end DM debugging issues */ 
+
+
             /* return the beginning of our directMessage object
                as well as dms object */  
             return {directMessage, dms}
           })
           .catch( err => {
             console.log("Can't connect to Direct Message api")
-            resolve();
+            resolve();  
           })
         )
       })
       .then(result => {
         const id = result.directMessage.user.id
         let messages = result.dms.data.events;
+
         messages = messages
           /* Return only the elments in the array that contain
              The person user is conversing with, either as a sender or reciever */
